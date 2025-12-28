@@ -48,8 +48,23 @@ router.get('/all', authenticate, async (req, res) => {
   res.status(200).json(records);
 });
 
+router.delete("/:id", authenticate, async (req, res) => {
+  const id = req.params.id
+  try {
+    const recordForDelete = await Record.findOne({ _id: id })
+    if (recordForDelete.userId == req.user.id) {
+      await Record.findByIdAndDelete(id)
+      return res.status(200).json({ message: "Deletion success" })
+    } else {
+      return res.status(401).json({ message: "can not delete a record that is not yours" })
+    }
+  } catch (error) {
+    return res.json({ error: error })
+  }
+})
+
 router.get('/merchant', authenticate, async (req, res) => {
-  const { from, to , MerchantId} = req.query;
+  const { from, to, MerchantId } = req.query;
 
   const startDate = new Date(from);
   const endDate = new Date(to);
