@@ -7,12 +7,14 @@ const router = express.Router();
 
 router.post('/', authenticate, async (req, res) => {
   const { amount, type, description, date, time } = req.body;
+  const [year, month, day] = date.split(/[-/]/);
+const fixedDate = new Date(Date.UTC(year, month - 1, day));
   const record = new Record({
     userId: req.user.id.toString(),
     amount,
     type,
     description,
-    date: new Date(date),
+    date: fixedDate,
     time,
   });
   await record.save();
